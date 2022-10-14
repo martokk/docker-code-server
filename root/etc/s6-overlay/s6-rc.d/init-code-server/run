@@ -23,6 +23,11 @@ fi
     cp /root/.bashrc /config/.bashrc
 [[ ! -f /config/.profile ]] &&
     cp /root/.profile /config/.profile
+[[ ! -d /config/dotfiles/ ]] &&
+    cp -r /root/dotfiles /config/dotfiles
+
+git config --global --add safe.directory /config/dotfiles
+chown -R abc:abc /config/dotfiles
 
 # fix permissions (ignore contents of /config/workspace)
 find /config -path /config/Projects -prune -o -exec chown abc:abc {} +
@@ -31,3 +36,8 @@ chmod 700 /config/.ssh
 if [ -n "$(ls -A /config/.ssh)" ]; then
     chmod 600 /config/.ssh/*
 fi
+
+cd /config/dotfiles || exit 1
+git pull
+bash /config/dotfiles/install.sh dev
+ln -s /config/dotfiles /config/Projects/dotfiles
